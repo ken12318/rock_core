@@ -1,0 +1,186 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | 岩心智能识别系统后台{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+:root {
+  --primary: #12344d;
+  --secondary: #1f6f78;
+  --accent: #2f9e8f;
+  --primary-fg: #ffffff;
+  --body-bg: #eef3f7;
+  --body-fg: #172238;
+  --header-color: #ffffff;
+  --breadcrumbs-bg: #1f6f78;
+  --link-fg: #1f6f78;
+  --link-hover-color: #12344d;
+  --hairline-color: #d9e2ec;
+  --border-color: #d9e2ec;
+  --darkened-bg: #f7fafc;
+  --selected-bg: #e8f3f4;
+  --selected-row: #eef8f7;
+}
+
+body {
+  background:
+    linear-gradient(135deg, rgba(31, 111, 120, .12), transparent 36%),
+    linear-gradient(315deg, rgba(47, 158, 143, .11), transparent 42%),
+    #eef3f7;
+  color: #172238;
+  font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+}
+
+#header {
+  min-height: 64px;
+  background: linear-gradient(135deg, #12344d, #1f6f78);
+  box-shadow: 0 10px 30px rgba(18, 52, 77, .18);
+}
+
+#branding h1,
+#branding h1 a:link,
+#branding h1 a:visited {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+#branding h1::before {
+  content: "RC";
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-right: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: .5px;
+  vertical-align: middle;
+}
+
+#user-tools {
+  font-size: 13px;
+  color: rgba(255, 255, 255, .78);
+}
+
+#user-tools a {
+  border-bottom: 0;
+  color: #fff;
+  font-weight: 700;
+}
+
+div.breadcrumbs {
+  padding: 12px 40px;
+  background: #1f6f78;
+  color: rgba(255, 255, 255, .88);
+}
+
+#content {
+  padding: 28px 34px;
+}
+
+#content h1 {
+  margin: 0 0 22px;
+  color: #12344d;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.module {
+  overflow: hidden;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(23, 34, 56, .08);
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+  background: #f4f8fb;
+  color: #12344d;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+table {
+  border-color: #d9e2ec;
+}
+
+thead th {
+  background: #f7fafc;
+  color: #516173;
+  font-weight: 800;
+}
+
+tr:nth-child(even) {
+  background: #fbfdff;
+}
+
+tr:hover {
+  background: #eef8f7;
+}
+
+.button,
+input[type=submit],
+input[type=button],
+.submit-row input,
+a.button {
+  border-radius: 8px;
+  background: #1f6f78;
+  font-weight: 800;
+}
+
+.button:hover,
+input[type=submit]:hover,
+input[type=button]:hover,
+.submit-row input:hover,
+a.button:hover {
+  background: #12344d;
+}
+
+.object-tools a,
+.object-tools a:link,
+.object-tools a:visited {
+  border-radius: 8px;
+  background: #2f9e8f;
+  font-weight: 800;
+}
+
+.object-tools a:hover {
+  background: #1f6f78;
+}
+
+#changelist {
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(23, 34, 56, .08);
+}
+
+#changelist-filter {
+  border-left: 1px solid #d9e2ec;
+  background: #f8fafc;
+}
+
+#changelist-filter h2 {
+  background: #12344d;
+}
+
+.dashboard #content {
+  max-width: 1180px;
+}
+
+.dashboard .module table th,
+.dashboard .module table td {
+  padding: 14px 16px;
+}
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">岩心智能识别系统后台</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

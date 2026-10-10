@@ -1,0 +1,144 @@
+{% extends "core_app/base.html" %}
+{% load static %}
+{% block body %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">RC</div>
+      <div>
+        <strong>岩心智能识别</strong>
+        <span>Reservoir Core AI</span>
+      </div>
+    </div>
+    <nav>
+      <a class="active" href="{% url 'dashboard' %}">智能检测</a>
+      <a href="{% url 'history' %}">历史记录</a>
+      <a href="{% url 'logout' %}">退出登录</a>
+    </nav>
+    <div class="side-note">
+      <span>当前用户</span>
+      <strong>{{ request.user.username }}</strong>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Core image interpretation</p>
+        <h1>岩心图像物性智能识别</h1>
+      </div>
+      <div class="status-pill">模型在线</div>
+    </header>
+
+    <section class="dashboard-grid">
+      <article class="panel input-panel">
+        <div class="panel-title">
+          <h2>样本输入</h2>
+          <span id="fileCount">尚未选择图片</span>
+        </div>
+        <div id="dropArea" class="drop-area">
+          <input id="imageUpload" type="file" accept="image/*" multiple hidden>
+          <div class="upload-icon">↑</div>
+          <strong>拖拽岩心图像到此处</strong>
+          <p>支持 JPG、PNG、JPEG，可一次上传多张切片进行整段统计</p>
+        </div>
+        <div id="previewGrid" class="preview-grid"></div>
+        <label class="select-label">岩石类型（可选）
+          <select id="rockType">
+            <option value="">不确定岩性，使用通用模型</option>
+            {% for item in rock_types %}
+            {% if item != "通用模型" %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </label>
+        <button id="submitBtn" class="primary-btn">开始识别</button>
+        <div id="errorTip" class="form-error hidden"></div>
+      </article>
+
+      <article class="panel result-panel">
+        <div class="panel-title">
+          <h2>评价结果</h2>
+          <span id="resultMode">等待检测</span>
+        </div>
+        <div id="emptyState" class="empty-state">上传样本后将显示孔隙度、渗透率和储层等级。</div>
+        <div id="loadingState" class="loading-state hidden">模型正在识别...</div>
+        <div id="resultState" class="hidden">
+          <div class="metric-row">
+            <div class="metric-card">
+              <span>平均孔隙度</span>
+              <strong id="porosityValue">0.00</strong>
+              <em>%</em>
+            </div>
+            <div class="metric-card">
+              <span>平均渗透率</span>
+              <strong id="permeabilityValue">0.00</strong>
+              <em>mD</em>
+            </div>
+          </div>
+          <div class="evaluation-box">
+            <div>
+              <span>均值物性参考等级</span>
+              <strong id="reservoirClass">-</strong>
+            </div>
+            <p id="analysisText"></p>
+          </div>
+          <div id="batchStats" class="stats-grid hidden">
+            <div><span>样本数</span><strong id="statCount">0</strong></div>
+            <div><span>孔隙度范围</span><strong id="statPoroRange">-</strong></div>
+            <div><span>渗透率范围</span><strong id="statPermRange">-</strong></div>
+            <div><span>标准差</span><strong id="statStd">-</strong></div>
+          </div>
+          <section class="analysis-section" aria-label="物性图表">
+            <div class="chart-tabs" role="tablist" aria-label="图表类型">
+              <button id="tabComparison" type="button" role="tab" aria-selected="true" aria-controls="chartPanel" data-chart-mode="comparison">样本对比</button>
+              <button id="tabScatter" type="button" role="tab" aria-selected="false" aria-controls="chartPanel" tabindex="-1" data-chart-mode="scatter">孔渗关系</button>
+              <button id="tabDistribution" type="button" role="tab" aria-selected="false" aria-controls="chartPanel" tabindex="-1" data-chart-mode="distribution">数值分布</button>
+              <button id="tabGrades" type="button" role="tab" aria-selected="false" aria-controls="chartPanel" tabindex="-1" data-chart-mode="grades">等级占比</button>
+            </div>
+            <div id="chartPanel" role="tabpanel" aria-labelledby="tabComparison">
+              <div class="chart-toolbar">
+                <h3 id="chartTitle">样本孔渗对比</h3>
+                <div class="chart-options">
+                  <label id="distributionControl" class="hidden">指标
+                    <select id="distributionMetric"><option value="porosity">孔隙度 (%)</option><option value="permeability">渗透率 (mD)</option></select>
+                  </label>
+                  <label id="logControl" class="check-label"><input id="logScale" type="checkbox">渗透率对数轴</label>
+                  <button id="downloadChartBtn" type="button" class="secondary-btn icon-btn" title="下载当前图表 PNG" aria-label="下载当前图表 PNG" disabled><i data-lucide="download" aria-hidden="true"></i></button>
+                </div>
+              </div>
+              <div id="chartError" class="form-error hidden" role="status"></div>
+              <div class="chart-wrap"><canvas id="resultChart" role="img" aria-label="岩心物性图表，数值见下方样本明细"></canvas></div>
+              <p id="chartCaption" class="analysis-note"></p>
+            </div>
+          </section>
+          <section class="analysis-section" aria-labelledby="summaryTitle">
+            <div class="section-heading"><h3 id="summaryTitle">分析总结</h3><span id="sampleBadge"></span></div>
+            <p id="demoNotice" class="form-error hidden">当前为演示模型，结果仅用于功能演示，不代表真实岩心物性。</p>
+            <div id="summaryInsights" class="summary-insights" aria-live="polite"></div>
+            <div class="table-wrap"><table class="statistics-table">
+              <thead><tr><th>指标</th><th>中位数</th><th>总体标准差</th><th>变异系数</th></tr></thead>
+              <tbody id="statisticsBody"></tbody>
+            </table></div>
+            <p id="analysisNote" class="analysis-note"></p>
+          </section>
+          <section class="analysis-section" aria-labelledby="samplesTitle">
+            <div class="section-heading"><h3 id="samplesTitle">样本明细</h3>
+              <label class="sample-filter"><input id="outliersOnly" type="checkbox">仅看统计异常</label>
+            </div>
+            <div class="table-wrap sample-table-wrap"><table class="sample-table">
+              <thead><tr><th>样本</th><th>孔隙度 (%)</th><th>渗透率 (mD)</th><th>参考等级</th><th>统计标记</th></tr></thead>
+              <tbody id="sampleBody"></tbody>
+            </table></div>
+          </section>
+          <div class="report-actions"><button id="exportBtn" class="secondary-btn">导出 Word 报告</button></div>
+          <div id="exportError" class="form-error hidden" role="status"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+<script src="{% static 'core_app/vendor/lucide.min.js' %}"></script>
+<script src="{% static 'core_app/js/dashboard.js' %}"></script>
+{% endblock %}

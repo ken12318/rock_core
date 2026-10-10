@@ -1,0 +1,54 @@
+{% extends "core_app/base.html" %}
+{% load static %}
+{% block title %}历史记录 - 岩心智能识别系统{% endblock %}
+{% block body %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">RC</div>
+      <div>
+        <strong>岩心智能识别</strong>
+        <span>Reservoir Core AI</span>
+      </div>
+    </div>
+    <nav>
+      <a href="{% url 'dashboard' %}">智能检测</a>
+      <a class="active" href="{% url 'history' %}">历史记录</a>
+      <a href="{% url 'logout' %}">退出登录</a>
+    </nav>
+  </aside>
+  <main class="workspace">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Detection archive</p>
+        <h1>岩心检测历史</h1>
+      </div>
+      <div class="header-actions">
+        <button id="exportHistoryBtn" class="secondary-btn">导出 Excel</button>
+        <button id="clearBtn" class="danger-btn">清空记录</button>
+      </div>
+    </header>
+    <section class="panel">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>岩性</th>
+              <th>孔隙度(%)</th>
+              <th>渗透率(mD)</th>
+              <th>图像</th>
+              <th>检测时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="historyTable">
+            <tr><td colspan="7" class="table-empty">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="{% static 'core_app/js/history.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "core_app/base.html" %}
+{% block title %}登录 - 岩心智能识别系统{% endblock %}
+{% block body %}
+<main class="auth-shell">
+  <section class="auth-panel">
+    <div class="brand-mark">RC</div>
+    <h1>岩心智能识别系统</h1>
+    <p>面向孔隙度、渗透率预测与储层综合评价</p>
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      <label>用户名<input name="username" autocomplete="username" required></label>
+      <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
+      {% if error %}<div class="form-error">{{ error }}</div>{% endif %}
+      <button type="submit">登录系统</button>
+    </form>
+    <a class="auth-link" href="{% url 'register' %}">没有账号？创建一个</a>
+  </section>
+</main>
+{% endblock %}
